@@ -78,6 +78,19 @@ app.add_middleware(
 # Register typed application error handlers
 register_error_handlers(app)
 
+# Root API welcome endpoint
+@app.get("/", include_in_schema=False)
+async def root():
+    return {
+        "name": "CivicFix API",
+        "version": "1.0.0",
+        "status": "online",
+        "documentation": "/docs",
+        "health": "/api/v1/health",
+        "message": "This is the CivicFix FastAPI backend service. Access the frontend user interface on your frontend host (Vercel or http://localhost:5173).",
+    }
+
+
 # Static file serving for uploads
 uploads_dir = Path(__file__).resolve().parent.parent / "uploads"
 uploads_dir.mkdir(parents=True, exist_ok=True)
