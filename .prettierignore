@@ -8,3 +8,4 @@ __pycache__/
 backend/uploads/
 backend/db/seeds/assets/
 package-lock.json
+

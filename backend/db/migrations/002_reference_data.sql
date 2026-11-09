@@ -24,3 +24,4 @@ INSERT INTO categories (id, code, name, icon, default_department_id, sla_hours) 
 (4, 'drainage', 'Blocked drain / waterlogging', 'waves', 4, 48),
 (5, 'water_leakage', 'Water leakage / supply issue', 'droplets', 5, 24)
 ON DUPLICATE KEY UPDATE name=VALUES(name);
+

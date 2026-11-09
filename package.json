@@ -5,7 +5,7 @@
   "description": "CivicFix: Neighbourhood-first civic issue platform",
   "scripts": {
     "dev": "concurrently -k -p \"[{name}]\" -n \"API,CLIENT\" -c \"cyan,magenta\" \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:server": "python -m uvicorn app.main:app --reload --app-dir backend",
+    "dev:server": "python -m uvicorn app.main:app --reload --app-dir backend --port 4000",
     "dev:client": "npm --prefix frontend run dev",
     "lint": "npm run lint:server && npm run lint:client",
     "lint:server": "python -m ruff check backend",

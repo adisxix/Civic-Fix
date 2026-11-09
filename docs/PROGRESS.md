@@ -18,6 +18,7 @@
 ## Priority Deliverables
 
 ### P0 (Must work for demo)
+
 - [x] Authentication (citizen & ward admin via JWT httpOnly cookie, single-click demo logins)
 - [x] Guided report form (photo, location picker with GPS, description, category)
 - [x] AI precheck (suggested category, summary, duplicate detection)
@@ -32,6 +33,7 @@
 - [x] Realistic seed demo data (Ward 14 issues, demo users, reference categories)
 
 ### P1 (Strongly expected)
+
 - [x] SLA clock calculation and visual status chip
 - [x] Before/After image comparison slider
 - [x] Chart.js analytics dashboards (doughnut, timeseries line, ageing bar, hotspots)

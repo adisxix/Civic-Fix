@@ -1,4 +1,4 @@
-"""AI service orchestrating Gemini calls and local fallbacks."""
+"""AI service orchestrating Groq/Gemini calls and local fallbacks."""
 
 import hashlib
 import json
@@ -10,12 +10,25 @@ import aiomysql
 from app.core.config import settings
 from app.core.logging import logger
 from app.modules.ai.gemini_client import GeminiClient
+from app.modules.ai.groq_client import GroqClient
 from app.modules.ai.mock import (
     classify_text_locally,
     summarize_reports_locally,
 )
 
+groq = GroqClient()
 gemini = GeminiClient()
+
+
+def get_active_client() -> tuple[Any, str, str]:
+    """Return active AI client, provider name ('groq' | 'gemini' | 'mock'), and model name."""
+    if (settings.AI_PROVIDER == "groq" or not settings.GEMINI_API_KEY) and groq.is_available():
+        return groq, "groq", settings.GROQ_MODEL
+    if gemini.is_available():
+        return gemini, "gemini", settings.GEMINI_MODEL
+    if groq.is_available():
+        return groq, "groq", settings.GROQ_MODEL
+    return None, "mock", "local-fallback"
 
 
 def hash_input(text: str) -> str:
@@ -59,19 +72,19 @@ class AiService:
         user_id: int | None = None,
     ) -> dict[str, Any]:
         """Classify report, suggest category, generate title and summary."""
-        # Load active category codes from DB
         async with conn.cursor() as cur:
             await cur.execute("SELECT code, id FROM categories ORDER BY id ASC")
             rows = await cur.fetchall()
             cat_map = {r["code"]: r["id"] for r in rows}
             category_codes = list(cat_map.keys())
 
+        client, provider, model = get_active_client()
         start_time = time.time()
-        if gemini.is_available():
+
+        if client is not None:
             try:
-                res = await gemini.classify_report(description, category_codes)
+                res = await client.classify_report(description, category_codes)
                 latency = int((time.time() - start_time) * 1000)
-                # Verify returned category code is in active codes
                 if res.category_code in cat_map:
                     data = {
                         "categoryCode": res.category_code,
@@ -82,7 +95,7 @@ class AiService:
                         "keywords": res.keywords,
                         "language": res.language,
                         "confidence": res.confidence,
-                        "source": "gemini",
+                        "source": provider,
                     }
                     await log_ai_call(
                         conn,
@@ -90,7 +103,7 @@ class AiService:
                         user_id,
                         None,
                         description,
-                        settings.GEMINI_MODEL,
+                        model,
                         data,
                         "ok",
                         latency,
@@ -98,7 +111,8 @@ class AiService:
                     return data
             except Exception as exc:
                 logger.warning(
-                    "Gemini classification failed, degrading to fallback", error=str(exc)
+                    f"{provider.capitalize()} classification failed, degrading to fallback",
+                    error=str(exc),
                 )
                 latency = int((time.time() - start_time) * 1000)
                 await log_ai_call(
@@ -107,7 +121,7 @@ class AiService:
                     user_id,
                     None,
                     description,
-                    settings.GEMINI_MODEL,
+                    model,
                     None,
                     "fallback",
                     latency,
@@ -137,18 +151,18 @@ class AiService:
         candidates: list[dict[str, Any]],
         user_id: int | None = None,
     ) -> list[dict[str, Any]]:
-        """Re-rank candidate issues using Gemini, or fallback."""
+        """Re-rank candidate issues using Groq/Gemini, or fallback."""
         if not candidates:
             return []
 
         start_time = time.time()
         candidate_ids = {c["issueId"] for c in candidates}
+        client, provider, model = get_active_client()
 
-        if gemini.is_available():
+        if client is not None:
             try:
-                verdicts = await gemini.re_rank_duplicates(new_report_text, candidates)
+                verdicts = await client.re_rank_duplicates(new_report_text, candidates)
                 latency = int((time.time() - start_time) * 1000)
-                # Map verdicts by valid candidate issueId
                 verdict_map = {v.issue_id: v for v in verdicts if v.issue_id in candidate_ids}
                 for c in candidates:
                     v = verdict_map.get(c["issueId"])
@@ -157,7 +171,7 @@ class AiService:
                             "sameProblem": v.same_problem,
                             "confidence": v.confidence,
                             "reason": v.reason[:200],
-                            "source": "gemini",
+                            "source": provider,
                         }
                     else:
                         c["aiVerdict"] = {
@@ -172,7 +186,7 @@ class AiService:
                     user_id,
                     None,
                     new_report_text,
-                    settings.GEMINI_MODEL,
+                    model,
                     candidates,
                     "ok",
                     latency,
@@ -180,7 +194,8 @@ class AiService:
                 return candidates
             except Exception as exc:
                 logger.warning(
-                    "Gemini duplicate ranking failed, degrading to fallback", error=str(exc)
+                    f"{provider.capitalize()} duplicate re-ranking failed, degrading to fallback",
+                    error=str(exc),
                 )
                 latency = int((time.time() - start_time) * 1000)
                 await log_ai_call(
@@ -189,13 +204,13 @@ class AiService:
                     user_id,
                     None,
                     new_report_text,
-                    settings.GEMINI_MODEL,
+                    model,
                     None,
                     "fallback",
                     latency,
                 )
 
-        # Fallback
+        # Fallback ranking based on spatial + lexical scores
         for c in candidates:
             c["aiVerdict"] = {
                 "sameProblem": c["score"] >= 0.50,
@@ -241,15 +256,16 @@ class AiService:
         reports_text = [r["description"] for r in reports]
         combined_text = "\n".join(reports_text)
         start_time = time.time()
+        client, provider, model = get_active_client()
 
-        if gemini.is_available():
+        if client is not None:
             try:
-                res = await gemini.summarize_cluster(reports_text)
+                res = await client.summarize_cluster(reports_text)
                 latency = int((time.time() - start_time) * 1000)
                 data = {
                     "summary": res.summary[:240],
                     "recurringDetails": res.recurring_details,
-                    "source": "gemini",
+                    "source": provider,
                 }
                 await log_ai_call(
                     conn,
@@ -257,14 +273,17 @@ class AiService:
                     user_id,
                     issue_id,
                     combined_text,
-                    settings.GEMINI_MODEL,
+                    model,
                     data,
                     "ok",
                     latency,
                 )
                 return data
             except Exception as exc:
-                logger.warning("Gemini issue summary failed", error=str(exc))
+                logger.warning(
+                    f"{provider.capitalize()} issue summary failed",
+                    error=str(exc),
+                )
                 latency = int((time.time() - start_time) * 1000)
                 await log_ai_call(
                     conn,
@@ -272,7 +291,7 @@ class AiService:
                     user_id,
                     issue_id,
                     combined_text,
-                    settings.GEMINI_MODEL,
+                    model,
                     None,
                     "fallback",
                     latency,

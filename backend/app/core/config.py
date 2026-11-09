@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     CLOUDINARY_API_SECRET: str = ""
     MAX_UPLOAD_MB: int = 5
 
+    AI_PROVIDER: str = "groq"
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GROQ_TIMEOUT_MS: int = 8000
+
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
     GEMINI_TIMEOUT_MS: int = 8000

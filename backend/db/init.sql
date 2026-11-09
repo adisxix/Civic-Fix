@@ -4,3 +4,4 @@ CREATE USER IF NOT EXISTS 'civicfix'@'%' IDENTIFIED BY 'civicfix';
 GRANT ALL PRIVILEGES ON civicfix.* TO 'civicfix'@'%';
 GRANT ALL PRIVILEGES ON civicfix_test.* TO 'civicfix'@'%';
 FLUSH PRIVILEGES;
+
