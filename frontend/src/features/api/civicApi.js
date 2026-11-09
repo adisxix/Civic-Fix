@@ -2,16 +2,26 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const DEFAULT_API_URL = 'https://civic-fix-lwyz.onrender.com/api/v1';
 
-const rawApiUrl = (
+let resolvedUrl = (
   import.meta.env.VITE_API_URL ||
   import.meta.env.VITE_API_BASE_URL ||
   DEFAULT_API_URL
 ).replace(/\/+$/, '');
 
+// Guard: if running in the browser on a remote host (e.g. Vercel), never attempt to call localhost
+if (
+  typeof window !== 'undefined' &&
+  window.location.hostname !== 'localhost' &&
+  window.location.hostname !== '127.0.0.1' &&
+  (resolvedUrl.includes('localhost') || resolvedUrl.includes('127.0.0.1'))
+) {
+  resolvedUrl = DEFAULT_API_URL;
+}
+
 const baseUrl =
-  rawApiUrl.startsWith('http') && !rawApiUrl.endsWith('/api/v1')
-    ? `${rawApiUrl}/api/v1`
-    : rawApiUrl;
+  resolvedUrl.startsWith('http') && !resolvedUrl.endsWith('/api/v1')
+    ? `${resolvedUrl}/api/v1`
+    : resolvedUrl;
 
 export const civicApi = createApi({
   reducerPath: 'civicApi',

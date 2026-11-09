@@ -16,7 +16,7 @@
     "test": "npm run test:server && npm run test:client",
     "test:server": "python -m pytest backend/tests",
     "test:client": "npm --prefix frontend test --if-present",
-    "build": "npm --prefix frontend run build",
+    "build": "npm --prefix frontend run build && node -e \"const fs=require('fs'); fs.cpSync('frontend/dist', 'dist', {recursive: true});\"",
     "db:init": "python backend/scripts/init_db.py",
     "db:migrate": "python backend/scripts/migrate.py",
     "db:seed": "python backend/scripts/seed.py",
