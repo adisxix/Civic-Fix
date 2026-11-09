@@ -3,6 +3,7 @@ import { Home, Compass, PlusCircle, Bell, User, LogOut, FileText } from 'lucide-
 import { useLogoutMutation, useGetNotificationsQuery } from '../features/api/civicApi';
 import { useAppSelector } from '../app/hooks';
 import { cn } from '../lib/cn';
+import { CivicFixLogo } from '../components/shared/CivicFixLogo';
 
 export function CitizenLayout() {
   const { user } = useAppSelector((state) => state.auth);
@@ -36,16 +37,8 @@ export function CitizenLayout() {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-200 p-5 shrink-0 justify-between">
         <div>
-          <div className="flex items-center gap-2.5 mb-8">
-            <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shadow-sm">
-              CF
-            </div>
-            <div>
-              <div className="font-extrabold text-base text-slate-900 leading-tight">CivicFix</div>
-              <div className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
-                Citizen Portal
-              </div>
-            </div>
+          <div className="mb-8">
+            <CivicFixLogo size={32} tagline={true} />
           </div>
 
           <nav className="space-y-1.5">
@@ -105,12 +98,7 @@ export function CitizenLayout() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header */}
         <header className="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between sticky top-0 z-30">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-bold text-xs">
-              CF
-            </div>
-            <span className="font-bold text-sm text-slate-900">CivicFix</span>
-          </div>
+          <CivicFixLogo size={28} />
 
           <div className="flex items-center gap-2">
             <button

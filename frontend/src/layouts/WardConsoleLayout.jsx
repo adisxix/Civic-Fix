@@ -3,6 +3,7 @@ import { Inbox, BarChart3, ShieldAlert, LogOut, Building2 } from 'lucide-react';
 import { useLogoutMutation } from '../features/api/civicApi';
 import { useAppSelector } from '../app/hooks';
 import { cn } from '../lib/cn';
+import { CivicFixLogo } from '../components/shared/CivicFixLogo';
 
 export function WardConsoleLayout() {
   const { user } = useAppSelector((state) => state.auth);
@@ -27,16 +28,8 @@ export function WardConsoleLayout() {
       {/* Dark Slate/Forest Sidebar */}
       <aside className="w-64 bg-slate-900 text-slate-100 flex flex-col justify-between p-5 border-r border-slate-800 shrink-0 hidden md:flex">
         <div>
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-sm shadow-sm">
-              CF
-            </div>
-            <div>
-              <div className="font-extrabold text-base text-white leading-tight">CivicFix</div>
-              <div className="text-[10px] text-emerald-400 font-mono uppercase tracking-wider">
-                Ward Admin
-              </div>
-            </div>
+          <div className="mb-8">
+            <CivicFixLogo size={32} textClassName="text-white" tagline={true} />
           </div>
 
           <div className="mb-6 p-3 rounded-xl bg-slate-800 border border-slate-700 text-xs">

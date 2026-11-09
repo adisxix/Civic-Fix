@@ -7,6 +7,13 @@ export const civicApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl,
     credentials: 'include',
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem('civicfix_token');
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   tagTypes: [
     'Me',

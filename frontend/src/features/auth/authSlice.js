@@ -22,14 +22,19 @@ export const authSlice = createSlice({
       state.status = 'idle';
     },
     setCredentials: (state, action) => {
-      state.user = action.payload;
-      state.isAuthenticated = !!action.payload;
+      const user = action.payload;
+      state.user = user;
+      state.isAuthenticated = !!user;
       state.status = 'succeeded';
+      if (user?.token) {
+        localStorage.setItem('civicfix_token', user.token);
+      }
     },
     clearCredentials: (state) => {
       state.user = null;
       state.isAuthenticated = false;
       state.status = 'idle';
+      localStorage.removeItem('civicfix_token');
     },
   },
   extraReducers: (builder) => {
@@ -45,19 +50,28 @@ export const authSlice = createSlice({
         state.status = 'failed';
       })
       .addMatcher(civicApi.endpoints.login.matchFulfilled, (state, action) => {
-        state.user = action.payload.data || action.payload.user || action.payload;
+        const user = action.payload.data || action.payload.user || action.payload;
+        state.user = user;
         state.isAuthenticated = true;
         state.status = 'succeeded';
+        if (user?.token) {
+          localStorage.setItem('civicfix_token', user.token);
+        }
       })
       .addMatcher(civicApi.endpoints.register.matchFulfilled, (state, action) => {
-        state.user = action.payload.data || action.payload.user || action.payload;
+        const user = action.payload.data || action.payload.user || action.payload;
+        state.user = user;
         state.isAuthenticated = true;
         state.status = 'succeeded';
+        if (user?.token) {
+          localStorage.setItem('civicfix_token', user.token);
+        }
       })
       .addMatcher(civicApi.endpoints.logout.matchFulfilled, (state) => {
         state.user = null;
         state.isAuthenticated = false;
         state.status = 'idle';
+        localStorage.removeItem('civicfix_token');
       });
   },
 });

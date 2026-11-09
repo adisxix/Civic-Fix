@@ -34,7 +34,7 @@ async def register(req: RegisterRequest, response: Response) -> dict[str, Any]:
         user_data, token = await service.register(conn, req)
         await conn.commit()
         set_auth_cookie(response, token)
-        return {"data": user_data}
+        return {"data": {**user_data, "token": token}}
 
 
 @router.post("/login")
@@ -43,7 +43,7 @@ async def login(req: LoginRequest, response: Response) -> dict[str, Any]:
         user_data, token = await service.login(conn, req)
         await conn.commit()
         set_auth_cookie(response, token)
-        return {"data": user_data}
+        return {"data": {**user_data, "token": token}}
 
 
 @router.post("/logout")

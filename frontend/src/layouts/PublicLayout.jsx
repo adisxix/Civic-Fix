@@ -2,24 +2,19 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { PlusCircle, LogIn, LayoutDashboard } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useAppSelector } from '../app/hooks';
+import { CivicFixLogo } from '../components/shared/CivicFixLogo';
 
 export function PublicLayout() {
   const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col text-slate-900">
+    <div className="min-h-screen bg-paper flex flex-col text-ink">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-sage-300">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link
-            to="/"
-            className="flex items-center gap-2.5 text-emerald-800 font-extrabold text-xl tracking-tight"
-          >
-            <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-base shadow-sm">
-              CF
-            </div>
-            <span>CivicFix</span>
+          <Link to="/" className="flex items-center">
+            <CivicFixLogo size={36} />
           </Link>
 
           <nav className="flex items-center gap-3">
