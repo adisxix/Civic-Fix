@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { ShieldCheck, Mail, Lock, User, Phone, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, Phone, ArrowRight } from 'lucide-react';
 import { useRegisterMutation, useGetMetaQuery } from '../../features/api/civicApi';
 import { useAppDispatch } from '../../app/hooks';
 import { setCredentials } from '../../features/auth/authSlice';
@@ -11,6 +11,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import Card from '../../components/ui/Card';
+import { CivicFixLogo } from '../../components/shared/CivicFixLogo';
 
 const registerSchema = z
   .object({
@@ -55,6 +56,7 @@ export default function RegisterPage() {
   const onSubmit = async (values) => {
     try {
       const payload = {
+        name: values.full_name,
         full_name: values.full_name,
         email: values.email,
         password: values.password,
@@ -63,11 +65,28 @@ export default function RegisterPage() {
       };
 
       const res = await registerUser(payload).unwrap();
-      dispatch(setCredentials(res.user));
+      const user = res?.data || res?.user || res;
+
+      if (!user || !user.role) {
+        throw new Error('Invalid user payload received from server');
+      }
+
+      dispatch(setCredentials(user));
+      if (user.token) {
+        localStorage.setItem('civicfix_token', user.token);
+      }
+
       toast.success('Account created successfully! Welcome to CivicFix.');
       navigate('/citizen/dashboard', { replace: true });
     } catch (err) {
-      toast.error(err?.data?.detail || 'Failed to create account. Please try again.');
+      const msg =
+        err?.data?.error?.message ||
+        err?.data?.message ||
+        err?.data?.detail ||
+        err?.error ||
+        err?.message ||
+        'Failed to create account. Please try again.';
+      toast.error(msg);
     }
   };
 
@@ -79,8 +98,8 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[85vh] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-600 text-white mb-4 shadow-lg shadow-emerald-600/20">
-          <ShieldCheck className="w-7 h-7" />
+        <div className="flex justify-center mb-4">
+          <CivicFixLogo size={48} showText={false} />
         </div>
         <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
           Create Citizen Account

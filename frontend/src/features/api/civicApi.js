@@ -1,9 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+const DEFAULT_API_URL = 'https://civic-fix-lwyz.onrender.com/api/v1';
+
 const rawApiUrl = (
   import.meta.env.VITE_API_URL ||
   import.meta.env.VITE_API_BASE_URL ||
-  '/api/v1'
+  DEFAULT_API_URL
 ).replace(/\/+$/, '');
 
 const baseUrl =
