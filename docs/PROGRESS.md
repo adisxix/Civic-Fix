@@ -7,7 +7,7 @@
 - [x] **Phase 2: Backend core (auth, meta, middleware, JWT cookies, security headers, rate limits)**
 - [x] **Phase 3: Backend: reports, issues, duplicate detection, uploads, EXIF strip**
 - [x] **Phase 4: Backend: ward workflow (state machine, assign, evidence, verification)**
-- [x] **Phase 5: Backend: Gemini AI assist + offline fallback + ward analytics**
+- [x] **Phase 5: Backend: Groq AI assist + offline fallback + ward analytics**
 - [x] **Phase 6: Frontend foundation (Vite, Tailwind CSS v4, RTK Query, design system)**
 - [x] **Phase 7: Citizen portal (dashboard, 4-step report flow with duplicate check, my reports, notifications, profile)**
 - [x] **Phase 8: Ward console and analytics (queue triage, workspace, evidence, moderation, Chart.js)**

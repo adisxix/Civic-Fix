@@ -311,7 +311,7 @@ _(The `meta` property is optional and returned on paginated or collection endpoi
         "priorityHint": "high",
         "language": "en",
         "confidence": "high",
-        "source": "gemini"
+        "source": "groq"
       },
       "candidates": [
         {

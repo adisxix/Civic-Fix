@@ -1,4 +1,4 @@
-"""AI service orchestrating Groq/Gemini calls and local fallbacks."""
+"""AI service orchestrating Groq calls and local fallbacks."""
 
 import hashlib
 import json
@@ -9,7 +9,6 @@ import aiomysql
 
 from app.core.config import settings
 from app.core.logging import logger
-from app.modules.ai.gemini_client import GeminiClient
 from app.modules.ai.groq_client import GroqClient
 from app.modules.ai.mock import (
     classify_text_locally,
@@ -17,15 +16,10 @@ from app.modules.ai.mock import (
 )
 
 groq = GroqClient()
-gemini = GeminiClient()
 
 
 def get_active_client() -> tuple[Any, str, str]:
-    """Return active AI client, provider name ('groq' | 'gemini' | 'mock'), and model name."""
-    if (settings.AI_PROVIDER == "groq" or not settings.GEMINI_API_KEY) and groq.is_available():
-        return groq, "groq", settings.GROQ_MODEL
-    if gemini.is_available():
-        return gemini, "gemini", settings.GEMINI_MODEL
+    """Return active AI client, provider name ('groq' | 'mock'), and model name."""
     if groq.is_available():
         return groq, "groq", settings.GROQ_MODEL
     return None, "mock", "local-fallback"
@@ -151,7 +145,7 @@ class AiService:
         candidates: list[dict[str, Any]],
         user_id: int | None = None,
     ) -> list[dict[str, Any]]:
-        """Re-rank candidate issues using Groq/Gemini, or fallback."""
+        """Re-rank candidate issues using Groq, or fallback."""
         if not candidates:
             return []
 

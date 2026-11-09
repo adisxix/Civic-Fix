@@ -293,7 +293,7 @@ export function LandingPage() {
           </div>
           <div className="p-4 bg-white rounded-xl border border-sage-300 space-y-1">
             <span className="font-bold text-forest-800">2. AI Assist</span>
-            <p className="text-moss">Gemini suggests category & searches duplicates.</p>
+            <p className="text-moss">AI suggests category & searches duplicates.</p>
           </div>
           <div className="p-4 bg-white rounded-xl border border-sage-300 space-y-1">
             <span className="font-bold text-forest-800">3. Cluster</span>

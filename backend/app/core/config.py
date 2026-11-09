@@ -41,11 +41,6 @@ class Settings(BaseSettings):
     GROQ_MODEL: str = "openai/gpt-oss-120b"
     GROQ_TIMEOUT_MS: int = 8000
 
-    GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.5-flash"
-    GEMINI_TIMEOUT_MS: int = 8000
-    GEMINI_MOCK: bool = True
-
     DUP_RADIUS_M: float = 150.0
     DUP_LOOKBACK_DAYS: int = 30
     DUP_MAX_CANDIDATES: int = 5

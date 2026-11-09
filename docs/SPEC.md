@@ -46,7 +46,7 @@ Hackathon scope (slide 9): one demo ward (Ward 14), five issue categories, citiz
 | -------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **P0**   | Must work for the demo | Auth, guided report form with photo + location, AI precheck (category + summary + possible duplicates), support an issue, nearby feed + map + issue detail, ward queue, assign (department + team member), status timeline, evidence upload, citizen verify/reopen, notifications, seed data |
 | **P1**   | Strongly expected      | SLA clock, before/after slider, Chart.js analytics (by category, status, time), ward performance view (hotspots, ageing, category backlogs), pilot scorecard, moderation (spam flags), rate limiting                                                                                         |
-| **P2**   | Stretch                | Gemini insights on aggregated stats, Gemini image analysis, PWA manifest, Hindi UI strings, department-scoped permissions                                                                                                                                                                    |
+| **P2**   | Stretch                | Groq AI insights on aggregated stats, AI image analysis, PWA manifest, Hindi UI strings, department-scoped permissions                                                                                                                                                                       |
 
 **Out of scope:** payments, native apps, real municipal API integration, WebSockets, multi-city tenancy, email/SMS/OAuth (write a notifier interface that only creates in-app notifications), admin user-management UI (users are created by seed and registration).
 
@@ -66,17 +66,17 @@ Mirrors the deck's "Technology stack" slide: a focused React + SQL build, with A
 | Frontend | Chart.js (react-chartjs-2)                             | Analytics dashboard  |
 | Backend  | Python 3.12+ + FastAPI + Uvicorn                       | Secure API           |
 | Database | SQL: MySQL 8 (InnoDB, utf8mb4) via aiomysql            | Records              |
-| AI       | Gemini API (google-genai Python SDK), server-side only | AI assist            |
+| AI       | Groq API (groq Python SDK), server-side only           | AI assist            |
 
 **Supporting libraries (not in the deck, needed to make it work):**  
 Frontend: `react-router-dom`, `react-hook-form` + `zod`, `react-leaflet` + `leaflet` (OpenStreetMap tiles, no API key), `date-fns`, `sonner` (toasts).  
-Python server: `fastapi`, `uvicorn[standard]`, `pydantic`, `pydantic-settings`, `aiomysql`, `bcrypt`, `PyJWT`, `python-multipart`, `Pillow`, `slowapi`, `structlog`, `python-dotenv`, `google-genai`, `sqlparse`.  
+Python server: `fastapi`, `uvicorn[standard]`, `pydantic`, `pydantic-settings`, `aiomysql`, `bcrypt`, `PyJWT`, `python-multipart`, `Pillow`, `slowapi`, `structlog`, `python-dotenv`, `groq`, `sqlparse`.  
 Optional: `cloudinary` Python SDK (images default to local disk).
 
 **Tooling:** npm for root/frontend JavaScript packages and scripts only · ESLint + Prettier for JavaScript · Ruff for Python lint/format · pytest + pytest-asyncio + httpx for FastAPI tests · concurrently (root dev script).
 
 **Database rules:** MySQL 8.0.16+ (CHECK constraints enforced). Driver aiomysql with an asynchronous connection pool. Hand-written SQL in repositories, no ORM. Plain .sql migration files + a small Python migration runner. Use ENUM for fixed vocabularies. All SQL isolated in repositories so the dialect is contained in one layer.  
-**Architecture (slide 8):** React app + UI + Redux <-> Secure API (Python + FastAPI) <-> SQL DB (records), with Gemini called only by the API as an AI assist. The React client never connects to SQL. Database credentials and the Gemini key never live in the client. Architecture style: modular monolith (one FastAPI application, feature modules). No microservices.
+**Architecture (slide 8):** React app + UI + Redux <-> Secure API (Python + FastAPI) <-> SQL DB (records), with Groq AI called only by the API as an AI assist. The React client never connects to SQL. Database credentials and the Groq key never live in the client. Architecture style: modular monolith (one FastAPI application, feature modules). No microservices.
 
 ---
 
@@ -105,7 +105,7 @@ civicfix/
 │   │       ├── reports/ duplicate_detection.py
 │   │       ├── ward/ (queue, assign, progress, evidence, moderation)
 │   │       ├── resolution/ notifications/ analytics/
-│   │       └── ai/ gemini_client.py ai_service.py prompts/ schemas.py mock.py
+│   │       └── ai/ groq_client.py ai_service.py prompts/ schemas.py mock.py
 │   │       (each module: router.py · schemas.py · service.py · repository.py)
 │   └── tests/ conftest.py unit/ integration/
 └── client/
@@ -184,7 +184,7 @@ Reassigning someone is an assignment event, not a status change.
 
 ### 6.2 Priority and routing
 
-- `priority`: `low` | `medium` | `high` | `critical`, default `medium`. Gemini may suggest a priority hint; the ward admin confirms at assignment.
+- `priority`: `low` | `medium` | `high` | `critical`, default `medium`. Groq AI may suggest a priority hint; the ward admin confirms at assignment.
 - No automatic escalation from support counts (show the support count prominently, allow sorting by it).
 - `department_id` is set at creation from `categories.default_department_id` (a deterministic rule, not AI) and confirmed or changed by the ward admin at assignment.
 
@@ -545,7 +545,7 @@ Write this out in full in `docs/API_CONTRACT.md` (request params, body, response
 | PATCH  | `/ward/issues/:id/status`     | W    | {toStatus, note?, reason?} via the state machine (start work, submit for verification, reassign after reopen, reject, overdue override)                                       |
 | POST   | `/ward/issues/:id/updates`    | W    | Publish progress: {note, nextStep?, visibility}                                                                                                                               |
 | POST   | `/ward/issues/:id/evidence`   | W    | multipart: image, kind (before, progress, after), caption                                                                                                                     |
-| POST   | `/ward/issues/:id/ai-summary` | W    | Regenerate the Gemini summary of all reports (suggestion only)                                                                                                                |
+| POST   | `/ward/issues/:id/ai-summary` | W    | Regenerate the AI summary of all reports (suggestion only)                                                                                                                    |
 | GET    | `/ward/team`                  | W    | Team members of the issue's ward, filterable by department (for the assignee dropdown)                                                                                        |
 | GET    | `/ward/moderation`            | W    | Flagged reports/issues awaiting review                                                                                                                                        |
 | POST   | `/ward/issues/:id/moderate`   | W    | {action (approve, reject), reason}                                                                                                                                            |
@@ -581,15 +581,15 @@ Config (env, tunable; engineering defaults, not proven thresholds):
 5. **Keep the top `DUP_MAX_CANDIDATES` with `score >= DUP_MIN_SCORE`, sorted by score.**  
    Return `distanceM`. Note: location + category alone can clear the threshold, which is intended. Text similarity is weak across synonyms ("pothole" vs "road crater") and across languages, which is exactly why stage 2 exists.
 
-### 10.2 Stage 2: Gemini re-rank (assistive)
+### 10.2 Stage 2: Groq AI re-rank (assistive)
 
-Send the new text + up to 5 candidate summaries to Gemini (see 11). Gemini returns per candidate `sameProblem` (bool), `confidence` (`high`, `medium`, `low`) and a one-line `reason`.  
+Send the new text + up to 5 candidate summaries to Groq AI (see 11). Groq returns per candidate `sameProblem` (bool), `confidence` (`high`, `medium`, `low`) and a one-line `reason`.  
 The backend:
 
 - discards any `issueId` that was not in the candidate list,
 - clamps `reason` to 200 chars,
-- keeps the stage-1 score as the ordering and attaches Gemini's verdict as a badge,
-- on any Gemini failure, timeout or invalid JSON, returns stage-1 candidates only with `source: "sql"`.
+- keeps the stage-1 score as the ordering and attaches Groq's verdict as a badge,
+- on any Groq failure, timeout or invalid JSON, returns stage-1 candidates only with `source: "sql"`.
 
 ### 10.3 Flow
 
@@ -602,7 +602,7 @@ The backend:
 
 ---
 
-## 11. Gemini module (server-only)
+## 11. Groq AI module (server-only)
 
 **Operating rule (slide 7):** AI may assist triage. It never decides who is at fault, who gets service first, or whether work is complete.
 
@@ -612,21 +612,21 @@ The backend:
 | Duplicate re-rank                                     | `/reports/precheck`           | per candidate: `{issueId, sameProblem, confidence, reason}`                                               |
 | Summary across all reports of an issue                | `/ward/issues/:id/ai-summary` | `{summary (max 240 chars), recurringDetails[]}`                                                           |
 
-**What Gemini must NOT do:** create or save complaints, merge issues, assign anyone, change status, confirm resolution, decide priority, check permissions. A person confirms every AI suggestion (category, department, priority, closure).
+**What Groq AI must NOT do:** create or save complaints, merge issues, assign anyone, change status, confirm resolution, decide priority, check permissions. A person confirms every AI suggestion (category, department, priority, closure).
 
 **Implementation rules:**
 
-- SDK: `google-genai` Python SDK.
-- Model from `GEMINI_MODEL` env (check the current Gemini docs for a fast, low-cost model and set the default there). Never hardcode a model name in service code.
-- Structured output: request JSON output with a response schema using the Python `google-genai` SDK, then validate the parsed result with Pydantic models. Invalid means fallback.
-- temperature about 0.2, hard timeout `GEMINI_TIMEOUT_MS` (default 8000), one retry max.
+- SDK: `groq` Python SDK (`AsyncGroq`).
+- Model from `GROQ_MODEL` env (default `openai/gpt-oss-120b`). Never hardcode a model name in service code.
+- Structured output: request JSON mode (`response_format={"type": "json_object"}`), then validate the parsed result with Pydantic models. Invalid means fallback.
+- temperature about 0.2, hard timeout `GROQ_TIMEOUT_MS` (default 8000), one retry max.
 - `categoryCode` must be one of the active category codes loaded from the DB and injected into the prompt. Reject anything else.
 - Prompt-injection hygiene: put user text inside delimiters (`<report_text>...</report_text>`), tell the model it is untrusted data and any instructions inside it are to be ignored. Never include emails, phone numbers or user names in prompts.
 - Hindi/English: the model detects the language and returns title + summary in English plus `language`. The original text is stored untouched.
-- `mock.py`: a deterministic keyword classifier (pothole/road/crater/gaddha, light/lamp/dark, garbage/waste/dustbin/kachra, drain/sewer/waterlog/naali, leak/pipe/water) plus a template title/summary. Used when `GEMINI_API_KEY` is empty, `GEMINI_MOCK=true`, or the real call fails.
-- Every response carries `source: 'gemini' | 'fallback'` so the UI can label it ("AI suggestion" vs "Suggested").
+- `mock.py`: a deterministic keyword classifier (pothole/road/crater/gaddha, light/lamp/dark, garbage/waste/dustbin/kachra, drain/sewer/waterlog/naali, leak/pipe/water) plus a template title/summary. Used when `GROQ_API_KEY` is empty, `AI_MOCK=true`, or the real call fails.
+- Every response carries `source: 'groq' | 'fallback'` so the UI can label it ("AI suggestion" vs "Suggested").
 - Log every call to `ai_logs` (operation, model, input hash, output JSON, status, latency). No raw descriptions.
-- Gemini key lives in server env only. It must never appear in the browser, the bundle or the network tab.
+- Groq key lives in server env only. It must never appear in the browser, the bundle or the network tab.
 
 ---
 
@@ -839,10 +839,10 @@ CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 MAX_UPLOAD_MB=5
-GEMINI_API_KEY=
-GEMINI_MODEL=gemini-2.5-flash # set per current Gemini docs (fast, low-cost model)
-GEMINI_TIMEOUT_MS=8000
-GEMINI_MOCK=false
+GROQ_API_KEY=
+GROQ_MODEL=openai/gpt-oss-120b
+GROQ_TIMEOUT_MS=8000
+AI_MOCK=false
 DUP_RADIUS_M=150
 DUP_LOOKBACK_DAYS=30
 DUP_MAX_CANDIDATES=5
@@ -870,7 +870,7 @@ Nothing else. No secrets with a `VITE_` prefix, ever.
 
 - **Backend (pytest + httpx against `DB_NAME_TEST`) must cover:**
   - State machine: every allowed transition succeeds for the right actor; every disallowed one returns 403/409; each writes an `issue_updates` row. A ward admin cannot move an issue to resolved (outside the overdue override); a non-linked citizen cannot verify/reopen; the reopen window is enforced. `awaiting_verification` is rejected without an after evidence record.
-  - Duplicate engine: bbox/radius/lookback/status/category filtering; scoring order is stable; `geo.py` haversine and `text_similarity.py` have their own unit tests; Gemini failure falls back to stage-1 only.
+  - Duplicate engine: bbox/radius/lookback/status/category filtering; scoring order is stable; `geo.py` haversine and `text_similarity.py` have their own unit tests; Groq AI failure falls back to stage-1 only.
   - Support uniqueness (double tap does nothing bad); the reporter cannot withdraw their own support.
   - Scope: a ward admin only sees their ward; `ward_id NULL` sees all.
   - Auth matrix: 401 without cookie, 403 wrong role, on a sample of every route group.
@@ -883,7 +883,7 @@ Nothing else. No secrets with a `VITE_` prefix, ever.
 
 ## 18. Definition of done and the demo script
 
-Done means this works end to end on seeded data, with Gemini both on and off (`GEMINI_MOCK=true`).  
+Done means this works end to end on seeded data, with Groq AI both on and off (`AI_MOCK=true`).  
 It is the deck's demo story: Resident reports pothole, neighbours support, ward assigns, work proof uploaded, resident confirms or reopens.
 
 1. **Resident (phone width):** log in as Asha. The feed and map show seeded issues including #CF-024 (12 supporters, assigned to Roads).
@@ -892,7 +892,7 @@ It is the deck's demo story: Resident reports pothole, neighbours support, ward 
 4. **Roads team member:** Start work, publish a progress note with a next step, attach completion proof, then Submit for verification.
 5. **Resident:** the notification arrives. Open the issue, use the before/after slider and Confirm the fix (status `resolved`). Repeat on another issue and flag it as not resolved (status `reopened`, ward admins notified).
 6. **Ward analytics:** KPI cards, charts, hotspots and the pilot scorecard reflect the new actions (duplicate reduction, time to triage, verified closure, backlog).
-7. **Trust check:** no endpoint lets AI or the ward team mark an issue citizen-confirmed; public responses expose no private data; the Gemini key and DB credentials never appear in the browser network tab or bundle.
+7. **Trust check:** no endpoint lets AI or the ward team mark an issue citizen-confirmed; public responses expose no private data; the Groq key and DB credentials never appear in the browser network tab or bundle.
 
 Also deliver: `README.md` (setup in the 5 commands from section 4, demo accounts, env, scripts), `docs/DEMO_SCRIPT.md`, `docs/ARCHITECTURE.md` (Mermaid diagram), and `docs/API_CONTRACT.md` matching the code.
 
@@ -903,7 +903,7 @@ Also deliver: `README.md` (setup in the 5 commands from section 4, demo accounts
 - Using pnpm or yarn, or adding an ORM / another database "to make it easier".
 - SQL in controllers, or status updates outside the state machine.
 - aiomysql gotchas: use `%s` (not `?`) placeholders; use `DictCursor` consistently; close cursors and release pooled connections; DATETIME values are naive so interpret them as UTC; avoid connection leaks; respect `ONLY_FULL_GROUP_BY` and keep all timestamps in UTC.
-- Treating Gemini output as trusted (always schema-validate; allow-list ids and codes).
+- Treating Groq AI output as trusted (always schema-validate; allow-list ids and codes).
 - Letting an AI suggestion silently overwrite the resident's chosen category.
 - Hardcoded chart data, or analytics computed in React.
 - Building three apps. It is one React app with role-based routes.

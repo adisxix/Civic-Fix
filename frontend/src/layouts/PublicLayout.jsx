@@ -74,7 +74,7 @@ export function PublicLayout() {
             access.
           </p>
           <p className="text-xs text-slate-500">
-            Built with React, FastAPI, aiomysql & Gemini AI. Demonstrating transparent citizen
+            Built with React, FastAPI, aiomysql & Groq AI. Demonstrating transparent citizen
             engagement and ward triage.
           </p>
         </div>

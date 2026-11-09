@@ -255,7 +255,7 @@ export default function WardWorkspacePage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-indigo-600" />
-                <h3 className="text-sm font-bold text-indigo-900">Gemini AI Problem Synthesis</h3>
+                <h3 className="text-sm font-bold text-indigo-900">AI Problem Synthesis</h3>
               </div>
               <Button
                 variant="outline"

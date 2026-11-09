@@ -2,14 +2,8 @@ import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { cn } from '../../lib/cn';
 
-export function AiSuggestionChip({
-  label,
-  confidence,
-  categoryName,
-  source = 'gemini',
-  className,
-}) {
-  const isAi = source === 'gemini';
+export function AiSuggestionChip({ label, confidence, categoryName, source = 'groq', className }) {
+  const isAi = source === 'groq' || source === 'ai';
   const displayLabel =
     label ||
     categoryName ||
@@ -26,7 +20,7 @@ export function AiSuggestionChip({
       )}
     >
       <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-      {isAi ? 'Gemini AI: ' : 'Suggested: '}
+      {isAi ? 'AI Suggestion: ' : 'Suggested: '}
       <span className="font-bold">{displayLabel}</span>
     </span>
   );

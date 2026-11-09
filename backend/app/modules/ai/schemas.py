@@ -1,4 +1,4 @@
-"""Pydantic structured output models for Gemini AI assist."""
+"""Pydantic structured output models for Groq AI assist."""
 
 from typing import Literal
 

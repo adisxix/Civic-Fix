@@ -360,7 +360,7 @@ export default function ReportFlowPage() {
             <div className="py-12 text-center space-y-3">
               <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="text-sm font-medium text-slate-600">
-                Checking nearby reports and analyzing with Gemini AI...
+                Checking nearby reports and analyzing with AI...
               </p>
             </div>
           ) : (
@@ -371,7 +371,7 @@ export default function ReportFlowPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
                       <Sparkles className="w-4 h-4 text-indigo-600" />
-                      Gemini AI Recommendation
+                      AI Recommendation
                     </span>
                     <AiSuggestionChip
                       confidence={precheckResult.suggestion.confidence}

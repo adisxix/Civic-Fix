@@ -1,6 +1,6 @@
 # CivicFix: Agent Rules
 
-You are building CivicFix, a neighbourhood-first civic issue platform: React + Python/FastAPI + MySQL + Gemini API. The full spec is docs/SPEC.md. Read the relevant section before touching any area of the code. Progress is tracked in docs/PROGRESS.md.
+You are building CivicFix, a neighbourhood-first civic issue platform: React + Python/FastAPI + MySQL + Groq AI API. The full spec is docs/SPEC.md. Read the relevant section before touching any area of the code. Progress is tracked in docs/PROGRESS.md.
 
 ## Non-negotiable rules
 
@@ -14,8 +14,8 @@ You are building CivicFix, a neighbourhood-first civic issue platform: React + P
 4. **One API contract.** `docs/API_CONTRACT.md` is the single interface between client and server. Update it in the same change as any endpoint change.
 5. **FastAPI layering:** `APIRouter` -> dependencies/middleware (auth, role checks, rate limit) -> thin route handler (HTTP only) -> service (business logic, transactions) -> repository (SQL). No SQL outside repositories. No business logic in route handlers. No Request/Response objects in services.
 6. **SQL safety:** aiomysql parameterised queries only (`%s` placeholders). Never concatenate user input into SQL. Multi-step writes use async transactions (`with_transaction`). Lock rows with `SELECT ... FOR UPDATE` inside transactions when racing writes matter.
-7. **Secrets:** the Gemini key, DB credentials, JWT secret and any cloud keys live only in server env. The browser never talks to the database. Nothing secret in client code, `VITE_*` vars, Redux, logs or responses. Commit `.env.example`, never `.env`.
-8. **AI assists, never decides.** Gemini may suggest a category, summary, priority hint or possible duplicates. It must never create/merge issues, assign anyone, change status, or approve a closure. Every Gemini call has a deterministic fallback and a timeout; the app must work with Gemini fully offline.
+7. **Secrets:** the Groq key, DB credentials, JWT secret and any cloud keys live only in server env. The browser never talks to the database. Nothing secret in client code, `VITE_*` vars, Redux, logs or responses. Commit `.env.example`, never `.env`.
+8. **AI assists, never decides.** Groq may suggest a category, summary, priority hint or possible duplicates. It must never create/merge issues, assign anyone, change status, or approve a closure. Every AI call has a deterministic fallback and a timeout; the app must work with AI fully offline.
 9. **No auto-merge, no auto-close.** A person always confirms duplicates, routing, priority and closure.
 10. **Privacy:** public endpoints never return reporter email/phone/name. Strip EXIF/GPS from uploaded photos. Ask permission (an explicit button click) before using device location.
 11. **Server data lives in RTK Query, not hand-written slices.** Redux slices are only for auth session, UI state, report draft and filters.

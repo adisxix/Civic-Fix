@@ -7,7 +7,7 @@ CivicFix is architected as a clean modular monolith:
 1. **Frontend (`frontend/`)**: React 19 (Vite, JavaScript), Tailwind CSS v4, Redux Toolkit + RTK Query, React Bits, Lucide React, Leaflet, and Chart.js.
 2. **Backend API (`backend/`)**: Python 3.12+ with FastAPI and Uvicorn. Layered architecture: `APIRouter` -> Dependencies (Auth, Role check, Rate limit) -> Route handlers -> Service (business transactions) -> Repository (parameterised raw SQL).
 3. **Database (`MySQL 8`)**: Relational database with InnoDB, utf8mb4, spatial indexing, CHECK constraints, and strict transactions.
-4. **AI Assist (`Gemini API`)**: Google GenAI SDK (server-side only) with structured outputs, prompt-injection isolation, and deterministic local fallback (`mock.py`).
+4. **AI Assist (`Groq API`)**: Groq AI SDK (server-side only) with structured outputs, prompt-injection isolation, and deterministic local fallback (`mock.py`).
 
 ```mermaid
 flowchart TD
@@ -35,13 +35,13 @@ flowchart TD
     subgraph Storage ["External & Persistence"]
         MySQL[("MySQL 8 (InnoDB, utf8mb4)")]
         Disk[("Local Uploads / Cloudinary")]
-        Gemini["Google Gemini API (Assist Only)"]
+        Groq["Groq AI API (Assist Only)"]
     end
 
     RTKQ <-->|HTTP / Cookie Auth| MW
     Repo <-->|Raw SQL via aiomysql| MySQL
     Service -->|Pillow Sanitised Files| Disk
-    Service -->|Classification & Duplicate Re-rank| Gemini
+    Service -->|Classification & Duplicate Re-rank| Groq
 ```
 
 ---
