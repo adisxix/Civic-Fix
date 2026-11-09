@@ -98,7 +98,7 @@ def seed_database() -> None:
                 # Asha - primary demo citizen
                 (
                     "Asha Sharma",
-                    "asha@demo.civicfix.test",
+                    "asha@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543210",
                     "citizen",
@@ -108,7 +108,7 @@ def seed_database() -> None:
                 # Supporters & reporters
                 (
                     "Ravi Kumar",
-                    "ravi@demo.civicfix.test",
+                    "ravi@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543211",
                     "citizen",
@@ -117,7 +117,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Meera Rao",
-                    "meera@demo.civicfix.test",
+                    "meera@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543212",
                     "citizen",
@@ -126,7 +126,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Karthik S",
-                    "karthik@demo.civicfix.test",
+                    "karthik@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543213",
                     "citizen",
@@ -135,7 +135,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Priya Nair",
-                    "priya@demo.civicfix.test",
+                    "priya@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543214",
                     "citizen",
@@ -144,7 +144,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Arjun Patel",
-                    "arjun@demo.civicfix.test",
+                    "arjun@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543215",
                     "citizen",
@@ -153,7 +153,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Sunita Verma",
-                    "sunita@demo.civicfix.test",
+                    "sunita@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543216",
                     "citizen",
@@ -162,7 +162,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Deepak Joshi",
-                    "deepak@demo.civicfix.test",
+                    "deepak@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543217",
                     "citizen",
@@ -171,7 +171,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Ananya Roy",
-                    "ananya@demo.civicfix.test",
+                    "ananya@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543218",
                     "citizen",
@@ -180,7 +180,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Vikram Reddy",
-                    "vikram@demo.civicfix.test",
+                    "vikram@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543219",
                     "citizen",
@@ -190,7 +190,7 @@ def seed_database() -> None:
                 # Ward admins
                 (
                     "Ward 14 Lead",
-                    "ward14.lead@demo.civicfix.test",
+                    "ward14.lead@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543220",
                     "ward_admin",
@@ -199,7 +199,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Roads Officer",
-                    "roads@demo.civicfix.test",
+                    "roads@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543221",
                     "ward_admin",
@@ -208,7 +208,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Lighting Officer",
-                    "lighting@demo.civicfix.test",
+                    "lighting@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543222",
                     "ward_admin",
@@ -217,7 +217,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Sanitation Officer",
-                    "sanitation@demo.civicfix.test",
+                    "sanitation@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543223",
                     "ward_admin",
@@ -226,7 +226,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Drainage Officer",
-                    "drainage@demo.civicfix.test",
+                    "drainage@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543224",
                     "ward_admin",
@@ -235,7 +235,7 @@ def seed_database() -> None:
                 ),
                 (
                     "Water Officer",
-                    "water@demo.civicfix.test",
+                    "water@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543225",
                     "ward_admin",
@@ -244,7 +244,7 @@ def seed_database() -> None:
                 ),
                 (
                     "City Administrator",
-                    "cityview@demo.civicfix.test",
+                    "cityview@demo.civicfix.org",
                     demo_pw_hash,
                     "9876543226",
                     "ward_admin",
@@ -264,9 +264,9 @@ def seed_database() -> None:
                 )
                 user_ids[email] = cur.lastrowid
 
-            asha_id = user_ids["asha@demo.civicfix.test"]
-            roads_officer_id = user_ids["roads@demo.civicfix.test"]
-            ward_lead_id = user_ids["ward14.lead@demo.civicfix.test"]
+            asha_id = user_ids["asha@demo.civicfix.org"]
+            roads_officer_id = user_ids["roads@demo.civicfix.org"]
+            ward_lead_id = user_ids["ward14.lead@demo.civicfix.org"]
 
             # Generate placeholder images
             pothole_img, pothole_key = generate_placeholder_image(
@@ -334,28 +334,28 @@ def seed_database() -> None:
                 ),
                 (
                     "Pothole near bus stop causing severe traffic backups.",
-                    user_ids["ravi@demo.civicfix.test"],
+                    user_ids["ravi@demo.civicfix.org"],
                     0,
                     None,
                     None,
                 ),
                 (
                     "Deep pothole near market junction, two-wheelers slipping.",
-                    user_ids["meera@demo.civicfix.test"],
+                    user_ids["meera@demo.civicfix.org"],
                     0,
                     None,
                     None,
                 ),
                 (
                     "Road damage near bus stop getting worse after morning rain.",
-                    user_ids["karthik@demo.civicfix.test"],
+                    user_ids["karthik@demo.civicfix.org"],
                     0,
                     None,
                     None,
                 ),
                 (
                     "Dangerous road crater on 8th Main.",
-                    user_ids["priya@demo.civicfix.test"],
+                    user_ids["priya@demo.civicfix.org"],
                     0,
                     None,
                     None,

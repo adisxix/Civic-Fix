@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/v1/:path*",
+      "destination": "https://civic-fix-lwyz.onrender.com/api/v1/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://civic-fix-lwyz.onrender.com/api/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

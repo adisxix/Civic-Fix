@@ -22,7 +22,7 @@ const DEMO_ACCOUNTS = [
   {
     role: 'Citizen',
     name: 'Asha Sharma',
-    email: 'asha@demo.civicfix.test',
+    email: 'asha@demo.civicfix.org',
     password: 'Demo@1234',
     badge: 'Ward 14 Resident',
     desc: 'File complaints & verify fixes',
@@ -30,7 +30,7 @@ const DEMO_ACCOUNTS = [
   {
     role: 'Ward Lead',
     name: 'Ward 14 Lead',
-    email: 'ward14.lead@demo.civicfix.test',
+    email: 'ward14.lead@demo.civicfix.org',
     password: 'Demo@1234',
     badge: 'Triage Admin',
     desc: 'Review queue & assign teams',
@@ -38,7 +38,7 @@ const DEMO_ACCOUNTS = [
   {
     role: 'Roads Officer',
     name: 'Roads Dept',
-    email: 'roads@demo.civicfix.test',
+    email: 'roads@demo.civicfix.org',
     password: 'Demo@1234',
     badge: 'Field Specialist',
     desc: 'Upload proof & complete work',
@@ -46,7 +46,7 @@ const DEMO_ACCOUNTS = [
   {
     role: 'City Ops',
     name: 'City-Wide View',
-    email: 'cityview@demo.civicfix.test',
+    email: 'cityview@demo.civicfix.org',
     password: 'Demo@1234',
     badge: 'Central Analytics',
     desc: 'City-wide metrics & backlogs',
@@ -102,6 +102,7 @@ export default function LoginPage() {
         err?.data?.error?.message ||
         err?.data?.message ||
         err?.data?.detail ||
+        err?.error ||
         err?.message ||
         'Failed to sign in. Please verify your credentials.';
       toast.error(msg);
@@ -185,8 +186,9 @@ export default function LoginPage() {
                 <button
                   key={demo.email}
                   type="button"
+                  disabled={isLoading}
                   onClick={() => handleQuickLogin(demo)}
-                  className="text-left p-3 rounded-xl border border-sage-300 bg-paper/60 hover:border-forest-700 hover:bg-lime-soft/40 transition-all text-xs group cursor-pointer shadow-xs"
+                  className="text-left p-3 rounded-xl border border-sage-300 bg-paper/60 hover:border-forest-700 hover:bg-lime-soft/40 transition-all text-xs group cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="flex items-center justify-between">
                     <p className="font-bold text-ink group-hover:text-forest-800">{demo.role}</p>
