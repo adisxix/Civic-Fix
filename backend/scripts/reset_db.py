@@ -16,6 +16,7 @@ DB_PORT = int(os.getenv("DB_PORT", 3306))
 DB_USER = os.getenv("DB_USER", "civicfix")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "civicfix")
 DB_NAME = os.getenv("DB_NAME", "civicfix")
+DB_SSL = os.getenv("DB_SSL", "false").lower() in ("true", "1", "yes")
 
 
 def reset_database() -> None:
@@ -24,16 +25,25 @@ def reset_database() -> None:
         sys.exit(1)
 
     print(f"Resetting database '{DB_NAME}' on {DB_HOST}:{DB_PORT}...")
+    conn_kwargs = {
+        "host": DB_HOST,
+        "port": DB_PORT,
+        "user": DB_USER,
+        "password": DB_PASSWORD,
+        "db": DB_NAME,
+        "charset": "utf8mb4",
+        "autocommit": True,
+    }
+    if DB_SSL:
+        import ssl
+
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        conn_kwargs["ssl"] = ctx
+
     try:
-        conn = pymysql.connect(
-            host=DB_HOST,
-            port=DB_PORT,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            db=DB_NAME,
-            charset="utf8mb4",
-            autocommit=True,
-        )
+        conn = pymysql.connect(**conn_kwargs)
     except Exception as exc:
         print(f"Failed to connect: {exc}")
         sys.exit(1)

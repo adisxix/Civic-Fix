@@ -15,6 +15,7 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = int(os.getenv("DB_PORT", 3306))
 DB_ROOT_USER = os.getenv("DB_ROOT_USER", "root")
 DB_ROOT_PASSWORD = os.getenv("DB_ROOT_PASSWORD", "")
+DB_SSL = os.getenv("DB_SSL", "false").lower() in ("true", "1", "yes")
 
 
 def init_database() -> None:
@@ -24,14 +25,23 @@ def init_database() -> None:
         sys.exit(1)
 
     print(f"Connecting to MySQL server at {DB_HOST}:{DB_PORT} as '{DB_ROOT_USER}'...")
+    conn_kwargs = {
+        "host": DB_HOST,
+        "port": DB_PORT,
+        "user": DB_ROOT_USER,
+        "password": DB_ROOT_PASSWORD,
+        "autocommit": True,
+    }
+    if DB_SSL:
+        import ssl
+
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        conn_kwargs["ssl"] = ctx
+
     try:
-        conn = pymysql.connect(
-            host=DB_HOST,
-            port=DB_PORT,
-            user=DB_ROOT_USER,
-            password=DB_ROOT_PASSWORD,
-            autocommit=True,
-        )
+        conn = pymysql.connect(**conn_kwargs)
     except Exception as exc:
         print(f"Failed to connect to MySQL: {exc}")
         print("Please verify MySQL Server is running and root credentials in .env are correct.")

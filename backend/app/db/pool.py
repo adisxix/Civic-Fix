@@ -17,18 +17,27 @@ async def init_pool(db_name: str | None = None) -> aiomysql.Pool:
     global _pool
     target_db = db_name or settings.DB_NAME
     try:
-        _pool = await aiomysql.create_pool(
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            user=settings.DB_USER,
-            password=settings.DB_PASSWORD,
-            db=target_db,
-            charset="utf8mb4",
-            autocommit=False,
-            cursorclass=DictCursor,
-            minsize=1,
-            maxsize=10,
-        )
+        pool_kwargs = {
+            "host": settings.DB_HOST,
+            "port": settings.DB_PORT,
+            "user": settings.DB_USER,
+            "password": settings.DB_PASSWORD,
+            "db": target_db,
+            "charset": "utf8mb4",
+            "autocommit": False,
+            "cursorclass": DictCursor,
+            "minsize": 1,
+            "maxsize": 10,
+        }
+        if settings.DB_SSL:
+            import ssl
+
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+            pool_kwargs["ssl"] = ctx
+
+        _pool = await aiomysql.create_pool(**pool_kwargs)
         logger.info("Database connection pool initialized", db=target_db)
         return _pool
     except Exception as exc:

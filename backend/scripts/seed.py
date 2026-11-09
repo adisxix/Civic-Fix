@@ -21,6 +21,7 @@ DB_PORT = int(os.getenv("DB_PORT", 3306))
 DB_USER = os.getenv("DB_USER", "civicfix")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "civicfix")
 DB_NAME = os.getenv("DB_NAME", "civicfix")
+DB_SSL = os.getenv("DB_SSL", "false").lower() in ("true", "1", "yes")
 SEED_DEMO_USERS = os.getenv("SEED_DEMO_USERS", "true").lower() == "true"
 DEMO_CENTER_LAT = float(os.getenv("DEMO_CENTER_LAT", 12.9716))
 DEMO_CENTER_LNG = float(os.getenv("DEMO_CENTER_LNG", 77.5946))
@@ -57,16 +58,25 @@ def generate_placeholder_image(
 
 def seed_database() -> None:
     print(f"Seeding database '{DB_NAME}' with demo data...")
+    conn_kwargs = {
+        "host": DB_HOST,
+        "port": DB_PORT,
+        "user": DB_USER,
+        "password": DB_PASSWORD,
+        "db": DB_NAME,
+        "charset": "utf8mb4",
+        "autocommit": False,
+    }
+    if DB_SSL:
+        import ssl
+
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        conn_kwargs["ssl"] = ctx
+
     try:
-        conn = pymysql.connect(
-            host=DB_HOST,
-            port=DB_PORT,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            db=DB_NAME,
-            charset="utf8mb4",
-            autocommit=False,
-        )
+        conn = pymysql.connect(**conn_kwargs)
     except Exception as exc:
         print(f"Database connection failed: {exc}")
         sys.exit(1)
