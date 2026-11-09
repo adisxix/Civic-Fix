@@ -159,3 +159,4 @@ Return a valid JSON object:
         )
         content = response.choices[0].message.content or "{}"
         return ClusterSummaryResult.model_validate_json(content)
+
