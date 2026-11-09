@@ -15,7 +15,6 @@ import {
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { useGetPublicStatsQuery } from '../features/api/civicApi';
-import { CivicFixLogo } from '../components/shared/CivicFixLogo';
 
 export function LandingPage() {
   const navigate = useNavigate();
@@ -53,12 +52,12 @@ export function LandingPage() {
               fixes with before/after photos.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <Button
                 variant="lime"
                 size="lg"
                 onClick={() => navigate('/citizen/report')}
-                className="text-ink font-bold shadow-md hover:shadow-lg transition-all"
+                className="w-full sm:w-auto text-ink font-bold shadow-md hover:shadow-lg transition-all"
               >
                 Report an Issue <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
@@ -66,31 +65,37 @@ export function LandingPage() {
                 variant="outline"
                 size="lg"
                 onClick={() => navigate('/feed')}
-                className="bg-white hover:bg-mist text-ink border-sage-300 font-semibold"
+                className="w-full sm:w-auto bg-white hover:bg-mist text-ink border-sage-300 font-semibold"
               >
                 <Compass className="w-4 h-4 text-forest-800 mr-1" /> Explore Live Map
               </Button>
             </div>
 
             {/* Quick Stats Pill */}
-            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-sage-200">
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-6 border-t border-sage-200 text-center sm:text-left">
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-forest-800">
+                <div className="text-xl sm:text-3xl font-black text-forest-800">
                   {stats.issuesCount}
                 </div>
-                <div className="text-xs text-moss font-medium mt-0.5">Tracked Issues</div>
+                <div className="text-[11px] sm:text-xs text-moss font-medium mt-0.5">
+                  Tracked Issues
+                </div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-forest-800">
+                <div className="text-xl sm:text-3xl font-black text-forest-800">
                   {stats.supportersCount}
                 </div>
-                <div className="text-xs text-moss font-medium mt-0.5">Neighbour Upvotes</div>
+                <div className="text-[11px] sm:text-xs text-moss font-medium mt-0.5">
+                  Neighbour Upvotes
+                </div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-forest-800">
+                <div className="text-xl sm:text-3xl font-black text-forest-800">
                   {stats.verifiedClosurePercent}%
                 </div>
-                <div className="text-xs text-moss font-medium mt-0.5">Citizen-Verified</div>
+                <div className="text-[11px] sm:text-xs text-moss font-medium mt-0.5">
+                  Citizen-Verified
+                </div>
               </div>
             </div>
           </div>
@@ -268,9 +273,9 @@ export function LandingPage() {
       </section>
 
       {/* 4. Municipal Operations Banner */}
-      <section className="bg-forest-800 text-white rounded-3xl max-w-7xl mx-auto p-8 sm:p-12 border border-forest-600 shadow-xl">
+      <section className="bg-forest-800 text-white rounded-3xl max-w-7xl mx-auto p-6 sm:p-10 md:p-12 border border-forest-600 shadow-xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-8 space-y-4">
+          <div className="lg:col-span-8 space-y-4 text-left">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest-700 text-lime text-xs font-mono font-bold uppercase tracking-wider">
               <ShieldCheck className="w-3.5 h-3.5 text-lime" /> Built for Ward Teams
             </div>
@@ -304,27 +309,55 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* 5. Clean Footer CTA */}
-      <section className="text-center py-8 space-y-4 max-w-2xl mx-auto px-4">
-        <CivicFixLogo size={42} showText={true} />
-        <p className="text-sm text-moss font-medium">
-          Report once. Unite neighbourhood voices. Track every action.
-        </p>
-        <div className="flex items-center justify-center gap-3 pt-2">
-          <Button
-            variant="lime"
-            onClick={() => navigate('/citizen/report')}
-            className="text-ink font-bold"
-          >
-            Report an Issue Now
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => navigate('/login')}
-            className="bg-white text-ink border-sage-300"
-          >
-            Sign In with Demo Account
-          </Button>
+      {/* 5. Modern Bottom Call to Action */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-forest-800 via-forest-900 to-forest-950 p-8 sm:p-12 text-center border border-forest-700 shadow-xl">
+          <div className="relative z-10 max-w-2xl mx-auto space-y-5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forest-800 text-lime text-xs font-bold border border-lime/30">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Real-Time Citizen Action</span>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">
+              Ready to make your neighbourhood safer?
+            </h2>
+
+            <p className="text-sm sm:text-base text-slate-300 font-medium leading-relaxed">
+              Report civic problems in seconds, rally nearby residents with one tap, and follow
+              repairs from first assignment to verified closure.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 pt-2">
+              <Button
+                variant="lime"
+                size="lg"
+                onClick={() => navigate('/citizen/report')}
+                className="w-full sm:w-auto text-ink font-bold shadow-md hover:shadow-lg transition-all"
+              >
+                Report an Issue Now <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => navigate('/feed')}
+                className="w-full sm:w-auto bg-forest-800/80 hover:bg-forest-800 text-white border-forest-600 font-semibold"
+              >
+                <Compass className="w-4 h-4 text-lime mr-1.5" />
+                Explore Public Feed & Map
+              </Button>
+            </div>
+
+            <p className="text-xs text-slate-400 pt-2">
+              Municipal official or ward staff?{' '}
+              <button
+                type="button"
+                onClick={() => navigate('/login')}
+                className="font-bold text-lime hover:underline cursor-pointer"
+              >
+                Access Ward Console →
+              </button>
+            </p>
+          </div>
         </div>
       </section>
     </div>

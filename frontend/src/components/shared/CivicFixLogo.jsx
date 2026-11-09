@@ -52,9 +52,6 @@ export function CivicFixLogo({
             <span className={`text-xl font-black tracking-tight leading-none ${textClassName}`}>
               Civic<span className="text-lime-600 dark:text-lime">Fix</span>
             </span>
-            <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-lime-soft text-forest-800 uppercase tracking-widest leading-none border border-lime/40">
-              PRO
-            </span>
           </div>
           {tagline && (
             <span className="text-[10px] font-medium text-moss tracking-wider uppercase mt-0.5">

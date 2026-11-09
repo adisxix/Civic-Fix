@@ -78,6 +78,7 @@ app.add_middleware(
 # Register typed application error handlers
 register_error_handlers(app)
 
+
 # Root API welcome endpoint
 @app.get("/", include_in_schema=False)
 async def root():
