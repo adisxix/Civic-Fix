@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import 'leaflet/dist/leaflet.css';
+
+@theme {
+  --color-ink: #122d27;
+  --color-forest-800: #1b3b33;
+  --color-forest-700: #245445;
+  --color-forest-600: #2a5b45;
+  --color-forest-500: #316b54;
+  --color-moss: #4f6158;
+  --color-lime: #c8ec78;
+  --color-lime-soft: #e6f4c9;
+  --color-paper: #f4f7f2;
+  --color-mist: #eaf0e8;
+  --color-sage-200: #dde8e0;
+  --color-sage-300: #d5e0d6;
+  --color-signal: #e8893a;
+  --color-danger: #b42318;
+
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+.code-chip {
+  font-family: var(--font-mono);
+}

@@ -1,0 +1,30 @@
+{
+  "name": "civicfix",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CivicFix: Neighbourhood-first civic issue platform",
+  "scripts": {
+    "dev": "concurrently -k -p \"[{name}]\" -n \"API,CLIENT\" -c \"cyan,magenta\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "python -m uvicorn app.main:app --reload --app-dir backend",
+    "dev:client": "npm --prefix frontend run dev",
+    "lint": "npm run lint:server && npm run lint:client",
+    "lint:server": "python -m ruff check backend",
+    "lint:client": "npm --prefix frontend run lint",
+    "lint:fix": "python -m ruff check --fix backend && npm --prefix frontend run lint:fix",
+    "format": "prettier --write . && python -m ruff format backend",
+    "format:check": "prettier --check . && python -m ruff format --check backend",
+    "test": "npm run test:server && npm run test:client",
+    "test:server": "python -m pytest backend/tests",
+    "test:client": "npm --prefix frontend test --if-present",
+    "build": "npm --prefix frontend run build",
+    "db:init": "python backend/scripts/init_db.py",
+    "db:migrate": "python backend/scripts/migrate.py",
+    "db:seed": "python backend/scripts/seed.py",
+    "db:reset": "python backend/scripts/reset_db.py",
+    "db:verify": "python backend/scripts/verify_db.py"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prettier": "^3.5.3"
+  }
+}

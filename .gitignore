@@ -1,0 +1,30 @@
+# Node
+node_modules/
+dist/
+npm-debug.log*
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Environment files
+.env
+*.env.local
+
+# Uploads and temporary data
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/db/seeds/assets/*
+!backend/db/seeds/assets/.gitkeep
+
+# IDE and OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
